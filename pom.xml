@@ -17,6 +17,7 @@
     <artifactId>sphenon-module</artifactId>
     <groupId>com.sphenon</groupId>
     <version>1.0.0</version>
+    <relativePath></relativePath>
   </parent>
 
   <dependencies>
