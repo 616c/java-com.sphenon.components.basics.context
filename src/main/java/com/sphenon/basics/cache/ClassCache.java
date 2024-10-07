@@ -61,7 +61,6 @@ public class ClassCache {
             class_cache_checked.add(clid);
             Class ccc = null;
             try {
-                // log(context, "LOOKING FOR CLASS CACHE IN " + clid);
                 ccc = Class.forName("com.sphenon.basics.metadata.ClassCacheDataImpl_" + clid.replace(".","_"), true, cl);
             } catch (ClassNotFoundException cnfe) {
                 return null;
@@ -81,7 +80,6 @@ public class ClassCache {
             } catch (InvocationTargetException ite) {
                 return null;
             }
-            // log(context, "GOT CLASS CACHE IN " + clid);
         }
         return class_cache;
     }
@@ -120,9 +118,8 @@ public class ClassCache {
 
     static public Class getClassForName(CallContext context, String name) throws ClassNotFoundException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        /* if (name.matches(".*cocp.*")) { log(context, "##### - looking for " + name); } */
 
-        if (cache_disabled) { /* if (name.matches(".*cocp.*")) { log(context, "##### - cache disabled"); } */ return Class.forName(name, true, cl); }
+        if (cache_disabled) { return Class.forName(name, true, cl); }
 
         Map<String,Class> cc = null;
         Set<String> cnfc = null;
@@ -167,20 +164,7 @@ public class ClassCache {
             }
             parent_cl = cl.getParent();
             if (parent_cl != default_class_cache_class_loader) {
-//                 log(context, "-------------------------------------------------------------------------------");
                 System.err.println("*WARNING* - class cache accessed with URLClassLoaderWithId whose parent is not the default class loader (" + parent_cl + " - " + default_class_cache_class_loader + " - " + clid + ")");
-//                 log(context, "...............................................................................");
-//                 log(context, "stored one:");
-//                 default_class_cache_class_loader_throwable.printStackTrace();
-//                 log(context, "...............................................................................");
-//                 log(context, "current one:");
-//                 (new Throwable()).printStackTrace();
-//                 log(context, "-------------------------------------------------------------------------------");
-
-                // see below
-                // maybe default_class_cache_class_loader is just null, which means that
-                // no access to any class for the default happened before in this run,
-                // but which is unlikely (?)
             }
         } else {
             cc = default_class_cache;
@@ -200,16 +184,7 @@ public class ClassCache {
                 default_class_cache_class_loader_throwable = new Throwable();
                 is_new = true;
             } else if (default_class_cache_class_loader != cl) {
-//                 log(context, "-------------------------------------------------------------------------------");
                 System.err.println("*WARNING* - class cache accessed with two different default class loaders (" + cl + " - " + default_class_cache_class_loader + ")");
-//                 log(context, "...............................................................................");
-//                 log(context, "stored one:");
-//                 default_class_cache_class_loader_throwable.printStackTrace();
-//                 log(context, "...............................................................................");
-//                 log(context, "current one:");
-//                 (new Throwable()).printStackTrace();
-//                 log(context, "-------------------------------------------------------------------------------");
-
                 // i.e. the following assertion is NOT true:
                 // - there is one default class loader in use in the system
                 // - there are possibly several project specific class loaders in use,
@@ -230,16 +205,13 @@ public class ClassCache {
             all_class_not_found_caches.put(clid, cnfc);
         }
 
-        /* if (name.matches(".*cocp.*")) { log(context, "##### - loader id: " + clid); } */
         Class c = cc.get(name);
-        if (c != null) { /* if (name.matches(".*cocp.*")) { log(context, "##### - in cache"); } */ return c; }
+        if (c != null) { return c; }
         if (cnfc.contains(name)) { throw new ClassNotFoundException(); }
 
         if (parent_cl != null && default_class_cache != null) {
             c = default_class_cache.get(name);
-            if (c != null) { /* if (name.matches(".*cocp.*")) { log(context, "##### - in default cache"); } */ return c; }
-            // das hier wohl eher nicht, denn der parent kann ja gerade typischerweise weniger haben
-            // if (default_class_not_found_cache.contains(name)) { throw new ClassNotFoundException(); }
+            if (c != null) { return c; }
         }
 
         try {
@@ -251,10 +223,6 @@ public class ClassCache {
             }
             String not_found_name = name.replaceFirst(".*\\.","").replaceFirst("(Class_|Factory_|Retriever_)*", "");
 
-            // stop for debugger...
-            // if (not_found_name.equals("UMLModelElement")) {
-            //     log(context, "wow");
-            // }
             if (last_not_found_name != null && last_not_found_name.equals(not_found_name)) {
                 not_found_counter++;
             } else {
@@ -281,29 +249,14 @@ public class ClassCache {
 
             if (remember_classes) {
                 cnfc.add(name);
-                // log(context, "not found, and not yet in cache (" + clid + "): " + name);
-                /* if (name.matches(".*cocp.*")) { log(context, "##### - not found, cached"); } */
             }
             throw cnfe;
         }
-        // possibly we could extend URLClassLoaderWithId so that it automatically
-        // only handles classes for which it is responsible, e.g. by providing a
-        // regexp and checking each class - if it does not match, it delegates
-        // to it's parent loader in a way so that the class is added to and handled
-        // by that loader (e.g. by directly calling "class for name" or so)
-        //
-        // here, we should check then the class loader attached to the loaded class
-        // and put it into the corresponding cache here
-        //
-        // ...but this developes in the direction of OSGi - hmmmmm....
 
         if (remember_classes && c != null) {
             cc.put(name, c);
-            // log(context, "found, but not yet in cache (" + clid + "): " + name);
-            /* if (name.matches(".*cocp.*")) { log(context, "##### - found, cached"); } */
         }
 
-        /* if (name.matches(".*cocp.*")) { log(context, "##### - ok"); } */
         return c;
     }
 

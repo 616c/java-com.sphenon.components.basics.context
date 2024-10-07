@@ -37,4 +37,15 @@ public class RecordGroup implements Record, Dumpable {
             dn.dump(context, (new Integer(i++)).toString(), record);
         }
     }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        for (Record record : records) {
+            if (record != null) {
+                sb.append(record.toString());
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
 }

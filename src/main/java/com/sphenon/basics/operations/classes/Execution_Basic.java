@@ -1,7 +1,7 @@
 package com.sphenon.basics.operations.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -18,8 +18,11 @@ import com.sphenon.basics.context.*;
 import com.sphenon.basics.debug.*;
 import com.sphenon.basics.monitoring.*;
 import com.sphenon.basics.processing.*;
+import com.sphenon.basics.processing.classes.*;
 
+import com.sphenon.basics.function.*;
 import com.sphenon.ui.annotations.*;
+import com.sphenon.engines.aggregator.annotations.*;
 
 import com.sphenon.basics.operations.*;
 
@@ -27,97 +30,117 @@ import java.io.PrintStream;
 
 public class Execution_Basic implements Execution, Dumpable {
 
-    // static protected long all      = 0;
-
     public Execution_Basic (CallContext context) {
-        // all++;
-        // System.err.println("Basic: " + all);
-    }
-
-    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression, Record record) {
-        this.instruction    = instruction;
-        this.problem_state  = problem_state;
-        this.problem        = problem;
-        this.activity_state = activity_state;
-        this.progression    = progression;
-        this.record         = record;
-    }
-
-    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression) {
-        this.instruction    = instruction;
-        this.problem_state  = problem_state;
-        this.problem        = problem;
-        this.activity_state = activity_state;
-        this.progression    = progression;
-        this.record         = null;
     }
 
     public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state) {
-        this.instruction    = instruction;
-        this.problem_state  = problem_state;
-        this.problem        = problem;
-        this.activity_state = activity_state;
-        this.progression    = null;
-        this.record         = null;
+        this(context, instruction, problem_state, ProblemCategory.UNKNOWN, problem, activity_state, null, null, null, null);
     }
 
-    static public Execution_Basic createExecutionSuccess(CallContext context) {
-        return new Execution_Basic (context, null, ProblemState.OK, (Problem) null, ActivityState.COMPLETED);
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression) {
+        this(context, instruction, problem_state, ProblemCategory.UNKNOWN, problem, activity_state, progression, null, null, null);
     }
 
-//     static public Execution_Basic createExecutionSuccess(CallContext context, String instruction_description) {
-//         return new Execution_Basic (context, new Class_Instruction(context, instruction_description), ProblemState.OK, (Problem) null, ActivityState.COMPLETED);
-//     }
-
-    static public Execution_Basic createExecutionFailure(CallContext context, Throwable exception) {
-        return new Execution_Basic (context, null, ProblemState.ERROR, new ProblemException(context, exception), ActivityState.ABORTED);
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression, Record record) {
+        this(context, instruction, problem_state, ProblemCategory.UNKNOWN, problem, activity_state, progression, record, null, null);
     }
 
-    static public Execution_Basic createExecutionFailure(CallContext context, ProblemState problem_state, Problem problem) {
-        return new Execution_Basic (context, null, problem_state, problem, ActivityState.ABORTED);
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression, Record record, Getter result_getter) {
+        this(context, instruction, problem_state, ProblemCategory.UNKNOWN, problem, activity_state, progression, record, null, result_getter);
     }
 
-    static public Execution_Basic createExecutionFailure(CallContext context, String problem_description) {
-        return new Execution_Basic (context, null, ProblemState.ERROR, new ProblemMessage(context, problem_description), ActivityState.ABORTED);
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression, Record record, Object result) {
+        this(context, instruction, problem_state, ProblemCategory.UNKNOWN, problem, activity_state, progression, record, result, null);
     }
 
-//     static public Execution_Basic createExecutionFailure(CallContext context, String instruction_description, Throwable exception) {
-//         return new Execution_Basic (context, new Class_Instruction(context, instruction_description), ProblemState.ERROR, new ProblemException(context, exception), ActivityState.ABORTED);
-//     }
-
-//     static public Execution_Basic createExecutionSkipped(CallContext context) {
-//         return new Execution_Basic (context, null, ProblemState.IDLE_INCOMPLETE, (Problem) null, ActivityState.UNREADY, Class_Progression.NO_PROGRESS);
-//     }
-
-//     static public Execution_Basic createExecutionSkipped(CallContext context, String instruction_description) {
-//         return new Execution_Basic (context, new Class_Instruction(context, instruction_description), ProblemState.IDLE_INCOMPLETE, (Problem) null, ActivityState.UNREADY, Class_Progression.NO_PROGRESS);
-//     }
-
-//     static public Execution_Basic createExecutionInProgress(CallContext context) {
-//         return new Execution_Basic (context, null, ProblemState.IDLE_INCOMPLETE, (Problem) null, ActivityState.INPROGRESS, Class_Progression.NO_PROGRESS);
-//     }
-
-//     static public Execution_Basic createExecutionInProgress(CallContext context, String instruction_description) {
-//         return new Execution_Basic (context, new Class_Instruction(context, instruction_description), ProblemState.IDLE_INCOMPLETE, (Problem) null, ActivityState.INPROGRESS, Class_Progression.NO_PROGRESS);
-//     }
-
-    static public Execution_Basic createExecution(CallContext context, Instruction instruction, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression, Record record) {
-        return new Execution_Basic(context, instruction, problem_state, problem, activity_state, progression, record);
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, ProblemCategory problem_category, Problem problem, ActivityState activity_state) {
+        this(context, instruction, problem_state, problem_category, problem, activity_state, null, null, null, null);
     }
 
-//     static public Execution_Basic createExecution(CallContext context, String instruction_description, ProblemState problem_state, Problem problem, ActivityState activity_state, Progression progression, Record record) {
-//         return new Execution_Basic(context, new Class_Instruction(context, instruction_description), problem_state, problem, activity_state, progression, record);
-//     }
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, ProblemCategory problem_category, Problem problem, ActivityState activity_state, Progression progression) {
+        this(context, instruction, problem_state, problem_category, problem, activity_state, progression, null, null, null);
+    }
 
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, ProblemCategory problem_category, Problem problem, ActivityState activity_state, Progression progression, Record record) {
+        this(context, instruction, problem_state, problem_category, problem, activity_state, progression, record, null, null);
+    }
+
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, ProblemCategory problem_category, Problem problem, ActivityState activity_state, Progression progression, Record record, Object result) {
+        this(context, instruction, problem_state, problem_category, problem, activity_state, progression, record, result, null);
+    }
+
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, ProblemCategory problem_category, Problem problem, ActivityState activity_state, Progression progression, Record record, Getter result_getter) {
+        this(context, instruction, problem_state, problem_category, problem, activity_state, progression, record, null, result_getter);
+    }
+
+    public Execution_Basic (CallContext context, Instruction instruction, ProblemState problem_state, ProblemCategory problem_category, Problem problem, ActivityState activity_state, Progression progression, Record record, Object result, Getter result_getter) {
+        this.instruction      = instruction;
+        this.problem_state    = problem_state;
+        this.problem_category = problem_category;
+        this.problem          = problem;
+        this.activity_state   = activity_state;
+        this.progression      = progression;
+        this.record           = record;
+        this.result           = result;
+        this.result_getter    = result_getter;
+    }
+
+    @OCPIgnore()
     public void setSuccess(CallContext context) {
         this.setProblemState(context, ProblemState.OK);
+        this.setProblemCategory(context, ProblemCategory.OK);
         this.setProblem(context, null);
         this.setActivityState(context, ActivityState.COMPLETED);
+        this.setProgression(context, Class_Progression.COMPLETED);
     }
 
+    @OCPIgnore()
+    public void setIdle(CallContext context) {
+        this.setProblemState(context, ProblemState.IDLE);
+        this.setProblemCategory(context, ProblemCategory.OK);
+        this.setProblem(context, null);
+        this.setActivityState(context, ActivityState.COMPLETED);
+        this.setProgression(context, Class_Progression.COMPLETED);
+    }
+
+    @OCPIgnore()
+    public void setSkipped(CallContext context) {
+        this.setProblemState(context, ProblemState.IDLE);
+        this.setProblemCategory(context, ProblemCategory.OK);
+        this.setProblem(context, null);
+        this.setActivityState(context, ActivityState.SKIPPED);
+        this.setProgression(context, Class_Progression.SKIPPED);
+    }
+
+    @OCPIgnore()
     public void setFailure(CallContext context, Throwable exception) {
         this.setProblemState(context, ProblemState.ERROR);
+        this.setProblemCategory(context, ProblemCategory.UNKNOWN);
         this.setProblem(context, new ProblemException(context, exception));
+        this.setActivityState(context, ActivityState.ABORTED);
+    }
+
+    @OCPIgnore()
+    public void setFailure(CallContext context, String problem_message) {
+        this.setProblemState(context, ProblemState.ERROR);
+        this.setProblemCategory(context, ProblemCategory.UNKNOWN);
+        this.setProblem(context, new ProblemMessage(context, problem_message));
+        this.setActivityState(context, ActivityState.ABORTED);
+    }
+
+    @OCPIgnore()
+    public void setFailure(CallContext context, ProblemCategory problem_category, Throwable exception) {
+        this.setProblemState(context, ProblemState.ERROR);
+        this.setProblemCategory(context, problem_category);
+        this.setProblem(context, new ProblemException(context, exception));
+        this.setActivityState(context, ActivityState.ABORTED);
+    }
+
+    @OCPIgnore()
+    public void setFailure(CallContext context, ProblemCategory problem_category, String problem_description) {
+        this.setProblemState(context, ProblemState.ERROR);
+        this.setProblemCategory(context, problem_category);
+        this.setProblem(context, new ProblemMessage(context, problem_description));
         this.setActivityState(context, ActivityState.ABORTED);
     }
 
@@ -131,6 +154,15 @@ public class Execution_Basic implements Execution, Dumpable {
         this.instruction = instruction;
     }
 
+    @OCPIgnore()
+    public void setInstruction (CallContext context, String instruction_description) {
+        this.instruction = new Class_Instruction(context, instruction_description);
+    }
+
+    public Instruction defaultInstruction (CallContext context) {
+        return null;
+    }
+
     protected ProblemState problem_state;
 
     @UIAttribute(Name="ProblemState",Classifier="ProblemState")
@@ -142,6 +174,21 @@ public class Execution_Basic implements Execution, Dumpable {
         this.problem_state = problem_state;
     }
 
+    protected ProblemCategory problem_category;
+
+    @UIAttribute(Name="ProblemCategory",Classifier="ProblemCategory")
+    public ProblemCategory getProblemCategory (CallContext context) {
+        return this.problem_category;
+    }
+
+    public ProblemCategory defaultProblemCategory (CallContext context) {
+        return ProblemCategory.UNKNOWN;
+    }
+
+    public void setProblemCategory (CallContext context, ProblemCategory problem_category) {
+        this.problem_category = problem_category;
+    }
+
     protected Problem problem;
 
     @UIAttribute(Name="Problem",Value="js:var value = instance.getProblem(context); Packages.com.sphenon.basics.debug.Dumper.dumpToString(context, null, value == null ? '' : value)",Classifier="Problem")
@@ -151,6 +198,10 @@ public class Execution_Basic implements Execution, Dumpable {
 
     public void setProblem (CallContext context, Problem problem) {
         this.problem = problem;
+    }
+
+    public Problem defaultProblem (CallContext context) {
+        return null;
     }
 
     protected ActivityState activity_state;
@@ -175,9 +226,13 @@ public class Execution_Basic implements Execution, Dumpable {
         this.progression = progression;
     }
 
+    public Progression defaultProgression (CallContext context) {
+        return null;
+    }
+
     protected Record record;
 
-    @UIAttribute(Name="Record",Classifier="Record")
+    @UIAttribute(Name="Record",Value="js:var value = instance.getRecord(context); Packages.com.sphenon.basics.debug.Dumper.dumpToString(context, null, value == null ? '' : value)",Classifier="Record")
     public Record getRecord (CallContext context) {
         return this.record;
     }
@@ -186,11 +241,48 @@ public class Execution_Basic implements Execution, Dumpable {
         this.record = record;
     }
 
+    public Record defaultRecord (CallContext context) {
+        return null;
+    }
+
     protected Performance performance;
 
     @UIAttribute(Name="Performance",Value="js:var value = instance.getPerformance(context); Packages.com.sphenon.basics.debug.Dumper.dumpToString(context, null, value == null ? '' : value)",Classifier="Performance")
     public Performance getPerformance (CallContext context) {
         return this.performance;
+    }
+
+    public void setPerformance (CallContext context, Performance performance) {
+        this.performance = performance;
+    }
+
+    public Performance defaultPerformance (CallContext context) {
+        return null;
+    }
+
+    protected Object result;
+    protected Getter result_getter;
+
+    public Object getResult (CallContext context) {
+        return   this.result != null ? this.result
+               : this.result_getter != null ? this.result_getter.get(context)
+               : null;
+    }
+
+    public void setResult (CallContext context, Object result) {
+        this.result = result;
+    }
+
+    public Object defaultResult (CallContext context) {
+        return null;
+    }
+
+    public void setResultGetter (CallContext context, Getter result_getter) {
+        this.result_getter = result_getter;
+    }
+
+    public Getter defaultResultGetter (CallContext context) {
+        return null;
     }
 
     public Execution wait (CallContext context) {
@@ -201,19 +293,25 @@ public class Execution_Basic implements Execution, Dumpable {
         return (this.instruction == null ? "" : this.instruction) + ":" + this.problem_state + "/" + this.activity_state + (this.progression != null ? ("/" + this.progression) : "") + (this.record != null ? ("/" + this.record) : "");
     }
 
+    public String toMessage() {
+        return toString();
+    }
+
     public void dump(CallContext context, DumpNode dump_node) {
-        dump_node.dump(context, "Execution     ", this.problem_state + "/" + this.activity_state);
+        dump_node.dump(context, "Execution     ", this.problem_state + (this.problem_category != null ? ("(" + this.problem_category + ")") : "") + "/" + this.activity_state);
         if (this.instruction != null) {
             dump_node.dump(context, "  Instruction ", this.instruction);
-        }
-        if (this.problem != null) {
-            dump_node.dump(context, "  Problem     ", this.problem);
         }
         if (this.progression != null) {
             dump_node.dump(context, "  Progression ", this.progression);
         }
-        if (this.record != null) {
-            dump_node.dump(context, "  Record      ", this.record);
+        if (this.getProblemState(context) != null && this.getProblemState(context).isOk(context) == false) {
+            if (this.problem != null) {
+                dump_node.dump(context, "  Problem     ", this.problem);
+            }
+            if (this.record != null) {
+                dump_node.dump(context, "  Record      ", this.record);
+            }
         }
     }
 }

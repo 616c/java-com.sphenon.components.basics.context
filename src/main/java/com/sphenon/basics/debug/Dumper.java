@@ -15,6 +15,7 @@ package com.sphenon.basics.debug;
 *****************************************************************************/
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import com.sphenon.basics.context.*;
 
 import java.lang.reflect.*;
@@ -23,6 +24,8 @@ import java.lang.annotation.*;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.reflect.Array;
+
+import java.io.OutputStream;
 
 public class Dumper {
 
@@ -66,6 +69,42 @@ public class Dumper {
     */
     static public String dumpToString(CallContext context, String name, Object instance) {
         return DumpNode_StringBuilder.dumpToString(context, name, instance);
+    }
+
+    /**
+       Dumps the contents of the given instance to a stream.
+       
+       @param name      the name of the instance, or some kind of identifier of this dump
+       @param instance  the instance to be dumped
+       @param os        the output stream to be dumped to
+       @return          the dump
+    */
+    static public void dumpToStream(CallContext context, String name, Object instance, OutputStream os) {
+        DumpNode_Stream.dumpToStream(context, name, instance, os);
+    }
+
+    static public void dumpToStream(CallContext context, String name, Object instance, OutputStream os, String indent, boolean show_names, boolean name_value_same_line, String indent_increment, boolean technical_details) {
+        DumpNode_Stream.dumpToStream(context, name, instance, os, indent, show_names, name_value_same_line, indent_increment, technical_details);
+    }
+
+    static public void dumpToPrintStream(CallContext context, String name, Object instance, PrintStream ps) {
+        DumpNode_Stream.dumpToPrintStream(context, name, instance, ps);
+    }
+
+    static public void dumpToPrintStream(CallContext context, String name, Object instance, PrintStream ps, String indent, boolean show_names, boolean name_value_same_line, String indent_increment, boolean technical_details) {
+        DumpNode_Stream.dumpToPrintStream(context, name, instance, ps, indent, show_names, name_value_same_line, indent_increment, technical_details);
+    }
+
+    /**
+       Dumps the contents of the given instance to a print writer.
+       
+       @param name      the name of the instance, or some kind of identifier of this dump
+       @param instance  the instance to be dumped
+       @param os        the print  writer to be dumped to
+       @return          the dump
+    */
+    static public void dumpToWriter(CallContext context, String name, Object instance, PrintWriter ps) {
+        DumpNode_Writer.dumpToWriter(context, name, instance, ps);
     }
 
     /**
@@ -286,9 +325,3 @@ public class Dumper {
         }
     }
 }
-
-
-
-
-
-

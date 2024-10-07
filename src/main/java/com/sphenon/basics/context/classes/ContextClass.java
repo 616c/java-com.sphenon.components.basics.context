@@ -77,8 +77,26 @@ public class ContextClass extends Context {
         return context_map;
     }
 
+    // static protected int debug_counter = 0;
+    // static protected boolean first_stack = true;
+
     public SpecificContext getSpecificContext(Class reg_class) {
-        return getSpecificContext(reg_class, false);
+        // if (debug_counter % 512 == 511) {
+        //     System.err.println("Context stack depth: " + debug_counter);
+        //     // (new Throwable()).printStackTrace();
+        // }
+        // synchronized (ContextClass.class) {
+        //     debug_counter++;
+        // }
+        // if (debug_counter >= 1023 && first_stack) {
+        //     first_stack = false;
+        //     (new Throwable()).printStackTrace();
+        // }
+        SpecificContext sc = getSpecificContext(reg_class, false);
+        // synchronized (ContextClass.class) {
+        //     debug_counter--;
+        // }
+        return sc;
     }
 
     public SpecificContext getSpecificContext(Class reg_class, boolean only_local) {
@@ -145,51 +163,5 @@ public class ContextClass extends Context {
 
     public LocationContext getLocationContext() {
         return this.location_context;
-    }
-    /**
-     * Debug Ausgabe
-     * Wen's beisst der nehme es raus
-     *
-     * AL: <naseruempf>naja<(naseruempf>
-     */
-    public String toString() {
-        boolean session=false;
-        boolean application=false;
-        String out=super.toString() + '[';
-        String sep = "";
-        if (context_map != null) {
-            for (Object key : context_map.keySet()) {
-                if (key.toString().contains("SessionContext")) {
-                    session = true;
-                }
-                if (key.toString().contains("ApplicationContext")) {
-                    application = true;
-                }
-            }
-        }
-        ContextClass parent = (ContextClass) call_context;
-        while (parent != null) {
-            if (parent.context_map != null) {
-                for (Object key : parent.context_map.keySet()) {
-                    if (key.toString().contains("SessionContext")) {
-                        session = true;
-                    }
-                    if (key.toString().contains("ApplicationContext")) {
-                        application = true;
-                    }
-                }
-            }
-            parent = (ContextClass)parent.call_context;
-        }
-        if (session) { 
-            out += sep + "Session";
-            sep = ",";
-        }
-        if (application) { 
-            out += sep + "Application";
-            sep = ",";
-        }
-        out=out + "]";
-        return out;
     }
 }

@@ -46,12 +46,6 @@ public class URLClassLoaderWithId extends URLClassLoader {
         return this.id;
     }
 
-    // IncludeRegExp
-    //
-    // ExcludeRegExp
-    //
-    // see comment in "ClassCache.java"
-
     static protected java.lang.reflect.Method findLoadedClass;
 
     public boolean isLoaded(String name) {

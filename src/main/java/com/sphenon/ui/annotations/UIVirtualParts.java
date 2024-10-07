@@ -16,7 +16,10 @@ package com.sphenon.ui.annotations;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+/**
+   Each entry is an expression that results in a part.
+ */
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface UIVirtualParts {
     String[]   value();

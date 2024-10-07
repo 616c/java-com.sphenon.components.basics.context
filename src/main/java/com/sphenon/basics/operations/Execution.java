@@ -38,6 +38,11 @@ public interface Execution {
     public ProblemState getProblemState (CallContext context);
 
     /**
+       The current {@link ProblemCategory} of the execution.
+    */
+    public ProblemCategory getProblemCategory (CallContext context);
+
+    /**
        Details about the {@link ProblemState}.
     */
     public Problem getProblem (CallContext context);
@@ -62,7 +67,12 @@ public interface Execution {
     */
     public Performance getPerformance (CallContext context);
 
-    // Siehe auch work.xuxf [EXEC]
+    /**
+       In case of a succesfully completed execution the result.
+    */
+    public Object getResult (CallContext context);
+
+    // see also work.xuxf [EXEC]
     /**
        Synchronises with this execution.
        Waits until it's activity state is either ABORTED or COMPLETED.

@@ -35,6 +35,10 @@ public class ProblemReturnCode implements Problem {
         this.return_code = return_code;
     }
 
+    public String getText(CallContext context) {
+        return this.toString();
+    }
+
     public String toString() {
         return "return code: " + this.return_code;
     }

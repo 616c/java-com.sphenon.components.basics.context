@@ -21,10 +21,13 @@ import java.io.InputStream;
 
 public class SystemContext extends SpecificContext {
 
+    static protected SystemContext default_singleton;
+    protected boolean is_default_singelton;
+
     static public SystemContext getOrCreate(Context context) {
         SystemContext system_context = (SystemContext) context.getSpecificContext(SystemContext.class);
         if (system_context == null) {
-            system_context = new SystemContext(context);
+            system_context = new SystemContext(context, false);
             context.setSpecificContext(SystemContext.class, system_context);
         }
         return system_context;
@@ -32,17 +35,21 @@ public class SystemContext extends SpecificContext {
 
     static public SystemContext get(Context context) {
         SystemContext system_context = (SystemContext) context.getSpecificContext(SystemContext.class);
-        return system_context;
+        if (system_context != null) {
+            return system_context;
+        }
+        return default_singleton == null ? (default_singleton = new SystemContext(context, true)) : default_singleton;
     }
 
     static public SystemContext create(Context context) {
-        SystemContext system_context = new SystemContext(context);
+        SystemContext system_context = new SystemContext(context, false);
         context.setSpecificContext(SystemContext.class, system_context);
         return system_context;
     }
 
-    protected SystemContext (Context context) {
+    protected SystemContext (Context context, boolean is_default_singelton) {
         super(context);
+        this.is_default_singelton = is_default_singelton;
     }
 
     protected PrintStream error_stream;
@@ -61,6 +68,15 @@ public class SystemContext extends SpecificContext {
                );
     }
 
+    static public class err {
+        static public void println(CallContext context, String string) {
+            SystemContext.get((Context) context).getErrorStream(context).println(string);
+        }
+        static public PrintStream stream(CallContext context) {
+            return SystemContext.get((Context) context).getErrorStream(context);
+        }
+    }
+
     protected PrintStream output_stream;
 
     public void setOutputStream(CallContext context, PrintStream output_stream) {
@@ -75,6 +91,15 @@ public class SystemContext extends SpecificContext {
                        system_context.getOutputStream(cc)
                      : System.out
                );
+    }
+
+    static public class out {
+        static public void println(CallContext context, String string) {
+            SystemContext.get((Context) context).getOutputStream(context).println(string);
+        }
+        static public PrintStream stream(CallContext context) {
+            return SystemContext.get((Context) context).getOutputStream(context);
+        }
     }
 
     protected InputStream input_stream;

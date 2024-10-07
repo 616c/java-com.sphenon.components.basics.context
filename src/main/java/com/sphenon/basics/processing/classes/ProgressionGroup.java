@@ -17,6 +17,7 @@ package com.sphenon.basics.processing.classes;
 import com.sphenon.basics.context.*;
 import com.sphenon.basics.context.classes.*;
 import com.sphenon.basics.debug.*;
+import com.sphenon.basics.system.*;
 
 import com.sphenon.basics.processing.*;
 
@@ -83,10 +84,10 @@ public class ProgressionGroup implements Progression, Dumpable {
                     }
                 }
             }
-        if (one_completed)     { return Progress.COMPLETED; }
-        if (some_progress)     { return Progress.SOME_PROGRESS; }
-        if (possibly_progress) { return Progress.POSSIBLY_PROGRESS; }
-        return Progress.NO_PROGRESS;
+            if (one_completed)     { return Progress.COMPLETED; }
+            if (some_progress)     { return Progress.SOME_PROGRESS; }
+            if (possibly_progress) { return Progress.POSSIBLY_PROGRESS; }
+            return Progress.NO_PROGRESS;
         } else {
             boolean possibly_progress = false;
             boolean some_progress     = false;
@@ -129,7 +130,7 @@ public class ProgressionGroup implements Progression, Dumpable {
     static public boolean dumpcalc = false;
 
     public float getPercent(CallContext context) {
-        indent++;
+        if (dumpcalc) { SystemContext.err.println(context, Integer.toHexString(System.identityHashCode(this)).toUpperCase() + " PG - getPercent..."); indent++; }
         float percent = 0;
         int j;
         boolean first = true;
@@ -138,6 +139,7 @@ public class ProgressionGroup implements Progression, Dumpable {
             if (w == null) {
                 w = new float[progressions.length];
                 float defw = 1.0F / ((float) progressions.length);
+                if (dumpcalc) { SystemContext.err.println(context, "Setting all weights to default " + defw); }
                 for (int i=0; i<progressions.length; i++) {
                     w[i] = defw;
                 }
@@ -145,6 +147,7 @@ public class ProgressionGroup implements Progression, Dumpable {
                 float[] xw = new float[progressions.length];
                 float defw = 1.0F / ((float) progressions.length);
                 float scale = w.length / ((float) progressions.length);
+                if (dumpcalc) { SystemContext.err.println(context, "Filling weights with default " + defw + ", scaling others by " + scale); }
                 for (int i=0; i<progressions.length; i++) {
                     if (i < w.length) {
                         xw[i] = w[i] * scale;
@@ -164,7 +167,7 @@ public class ProgressionGroup implements Progression, Dumpable {
                         for (j=0; j<indent; j++) { sb.append("  "); }
                         sb.append((first ? "[   " : "  + ") + p + " * " + w[i]);
                         first = false;
-                        System.err.println(sb.toString());
+                        SystemContext.err.println(context, sb.toString());
                     }
                     percent += p * w[i++];
                 }
@@ -177,9 +180,9 @@ public class ProgressionGroup implements Progression, Dumpable {
             for (j=0; j<indent; j++) { sb.append("  "); }
             sb.append((first ? "[ = " : "  = ") + percent + "]");
             first = false;
-            System.err.println(sb.toString());
+            SystemContext.err.println(context, sb.toString());
         }
-        indent--;
+        if (dumpcalc) { SystemContext.err.println(context, "PG - getPercent - done."); indent--; }
         return percent;
     }
 
@@ -203,6 +206,15 @@ public class ProgressionGroup implements Progression, Dumpable {
                 && (   this.getPercent(context) == (((Progression) object).getPercent(context))
                    )
                );
+    }
+
+    public String toString(CallContext context) {
+        return this.getProgress(context).toString() + '/' + ((int) getPercent(context)) + '%';
+    }
+
+    public String toString() {
+        CallContext context = RootContext.getFallbackCallContext();
+        return this.toString(context);
     }
 
     public void dump(CallContext context, DumpNode dump_node) {

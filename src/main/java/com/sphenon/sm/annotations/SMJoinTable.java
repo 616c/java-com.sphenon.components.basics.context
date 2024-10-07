@@ -16,7 +16,7 @@ package com.sphenon.sm.annotations;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface SMJoinTable {
     String[] value ();

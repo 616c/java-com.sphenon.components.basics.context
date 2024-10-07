@@ -90,7 +90,9 @@ public class DumpNode_StringBuilder implements DumpNode {
                 new_indent += indent_increment;
             }
         }
-        if (value instanceof Dumpable) {
+        if (    value instanceof Dumpable
+             && (value instanceof Throwable) == false
+           ) {
             if (this.isCurrentlyDumped(context, value)) {
                 this.out.append("-- recursion: dump discontinued --");
                 this.out.append('\n');
@@ -106,7 +108,7 @@ public class DumpNode_StringBuilder implements DumpNode {
             Dumper.dumpCommonType(context, value, subdn);
             subdn.close(context);
         } else {
-            this.out.append(value == null ? "(null)" : value.toString());
+            this.out.append(value == null ? "(null)" : ContextAware.ToString.convert(context, value));
             this.out.append('\n');
         }
     }

@@ -43,9 +43,13 @@ public class Class_Progression implements Progression, Dumpable, ContextAware {
         this.progress = progress;
     }
 
-    protected Class_Progression(CallContext context, Progress progress, Float percent) {
+    public Class_Progression(CallContext context, Progress progress, Float percent) {
         this.progress = progress;
         this.percent = percent;
+    }
+
+    public Class_Progression(CallContext context, Float percent) {
+        this.setPercent(context, percent);
     }
 
     public Progress getProgress(CallContext context) {
@@ -115,6 +119,11 @@ public class Class_Progression implements Progression, Dumpable, ContextAware {
     }
 
     public String toString(CallContext context) {
+        return progress.toString() + '/' + getPercent(context) + '%';
+    }
+
+    public String toString() {
+        CallContext context = RootContext.getFallbackCallContext();
         return progress.toString() + '/' + getPercent(context) + '%';
     }
 }

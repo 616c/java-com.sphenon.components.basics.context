@@ -17,11 +17,13 @@ package com.sphenon.ui.core;
 public enum UIEquipmentType {
     // Labels:
     Name,
+    CoreName,
     IconName,
 
     // Descriptions:
     ShortDescription,
     LongDescription,
+    Help,
 
     // Content:
     Text,

@@ -26,4 +26,5 @@ import com.sphenon.ui.annotations.*;
 @UIName       ("Problem")
 @UIClassifier ("Problem")
 public interface Problem {
+    public String getText(CallContext context);
 }

@@ -16,6 +16,7 @@ package com.sphenon.basics.monitoring;
 
 import com.sphenon.basics.context.*;
 import com.sphenon.ui.core.*;
+import com.sphenon.formats.json.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -26,8 +27,15 @@ import com.sphenon.ui.annotations.*;
 @UIId         ("problemstate")
 @UIName       ("ProblemState")
 @UIClassifier ("ProblemState")
-public class ProblemState implements UIEquipped {
+public class ProblemState implements UIEquipped, JSONSerialisable {
 
+    static public ProblemState UNDEFINED                 ;
+    static public ProblemState UNDEFINED_INCOMPLETE      ;
+                                                // applies to instances where no problem
+                                                // state is defined at all, and will likely
+                                                // never be defined; e.g. pure data holder
+                                                // (undefined/incomplete probably makes
+                                                // no sense)
 
     static public ProblemState IDLE                      ;
     static public ProblemState IDLE_INCOMPLETE           ;
@@ -45,17 +53,17 @@ public class ProblemState implements UIEquipped {
 
     static public ProblemState OK                        ;
     static public ProblemState OK_INCOMPLETE             ;
-                                                // (gruen)
+                                                // (green)
                                                 // everything's fine
 
     static public ProblemState INFO                      ;
     static public ProblemState INFO_INCOMPLETE           ;
-                                                // (gruen)
+                                                // (green)
                                                 // in case someone is interested
 
     static public ProblemState NOTICE                    ;
     static public ProblemState NOTICE_INCOMPLETE         ;
-                                                // ((gelbgruen))
+                                                // ((yellowgreen))
                                                 // please take into account
                                                 // (it is imaginable this is of interest to someone,
                                                 // but cannot be judged from the perspective of the
@@ -72,14 +80,14 @@ public class ProblemState implements UIEquipped {
 
     static public ProblemState CAUTION                   ;
     static public ProblemState CAUTION_INCOMPLETE        ;
-                                                // (gelb)
+                                                // (yellow)
                                                 // something is not proper, special
                                                 // attention may be required, but no
                                                 // concrete risk identified
 
     static public ProblemState WARNING                   ;
     static public ProblemState WARNING_INCOMPLETE        ;
-                                                // (gelb)
+                                                // (yellow)
                                                 // there is a conrete risk if no attention is paid,
                                                 // you better take into account ("you've been warned")
 
@@ -95,7 +103,7 @@ public class ProblemState implements UIEquipped {
 
     static public ProblemState ERROR                     ;
     static public ProblemState ERROR_INCOMPLETE          ;
-                                                // (rot)
+                                                // (red)
                                                 // operation/system is malfunctioning,
                                                 // normal processing cannot continue, either
                                                 // temporarily or finally; external
@@ -103,17 +111,17 @@ public class ProblemState implements UIEquipped {
 
     static public ProblemState CRITICAL_ERROR            ;
     static public ProblemState CRITICAL_ERROR_INCOMPLETE ;
-                                                // ((rot blinkend))
+                                                // ((red flashing))
                                                 // there is a risk of damage
 
     static public ProblemState FATAL_ERROR               ;
     static public ProblemState FATAL_ERROR_INCOMPLETE    ;
-                                                // ((rot blinkend))
+                                                // ((red flashing))
                                                 // damage has already been detected
 
     static public ProblemState EMERGENCY                 ;
     static public ProblemState EMERGENCY_INCOMPLETE      ;
-                                                // ((rot blinkend, sirene))
+                                                // ((red flashing, siren))
                                                 // damage is in progress, immediate action
                                                 // is indispensable
 
@@ -135,6 +143,7 @@ public class ProblemState implements UIEquipped {
     static public final int FATAL_ERROR_INDEX     = 10;
     static public final int EMERGENCY_INDEX       = 11;
     static public final int PANIC_INDEX           = 12;
+    static public final int UNDEFINED_INDEX       = 13;
 
     static public final String list_of_states_1 = "idle,ok,info,notice,unknown,caution,warning,severe_warning,error,critical_error,fatal_error,emergency,panic";
     static public final String list_of_states_2 = "complete,incomplete";
@@ -153,6 +162,7 @@ public class ProblemState implements UIEquipped {
         { { 255,   0,   0 }, { 128,   0,   0 } }, // FATAL_ERROR
         { { 255,   0,   0 }, { 128,   0,   0 } }, // EMERGENCY
         { { 255,   0,   0 }, { 128,   0,   0 } }, // PANIC
+        { {   0,   0,   0 }, {   0,   0,   0 } }, // UNDEFINED
     };
 
     static protected String[][] RGBHex = {
@@ -169,6 +179,7 @@ public class ProblemState implements UIEquipped {
         { "FF0000", "800000" }, // FATAL_ERROR
         { "FF0000", "800000" }, // EMERGENCY
         { "FF0000", "800000" }, // PANIC
+        { "000000", "808080" }  // UNDEFINED
     };
 
     static public ProblemState[] ALL_STATES;
@@ -180,6 +191,10 @@ public class ProblemState implements UIEquipped {
 
     public int[] getRGB(CallContext cc) {
         return RGB[this.index][this.information_complete ? 0 : 1];
+    }
+
+    public String getRGBHex(CallContext cc) {
+        return RGBHex[this.index][this.information_complete ? 0 : 1];
     }
 
     protected int     index;
@@ -246,6 +261,8 @@ public class ProblemState implements UIEquipped {
         EMERGENCY_INCOMPLETE         = new ProblemState(EMERGENCY_INDEX, false, "EMERGENCY_INCOMPLETE");
         PANIC                        = new ProblemState(PANIC_INDEX, true, "PANIC");
         PANIC_INCOMPLETE             = new ProblemState(PANIC_INDEX, false, "PANIC_INCOMPLETE");
+        UNDEFINED                    = new ProblemState(UNDEFINED_INDEX, true, "UNDEFINED");
+        UNDEFINED_INCOMPLETE         = new ProblemState(UNDEFINED_INDEX, false, "UNDEFINED_INCOMPLETE");
 
         ALL_STATES                   = makeStates(IDLE, IDLE_INCOMPLETE, OK, OK_INCOMPLETE, INFO, INFO_INCOMPLETE, NOTICE, NOTICE_INCOMPLETE, UNKNOWN, UNKNOWN_INCOMPLETE, CAUTION, CAUTION_INCOMPLETE, WARNING, WARNING_INCOMPLETE, SEVERE_WARNING, SEVERE_WARNING_INCOMPLETE, ERROR, ERROR_INCOMPLETE, CRITICAL_ERROR, CRITICAL_ERROR_INCOMPLETE, FATAL_ERROR, FATAL_ERROR_INCOMPLETE, EMERGENCY, EMERGENCY_INCOMPLETE, PANIC, PANIC_INCOMPLETE);
         RED_STATES                   = makeStates(ERROR, ERROR_INCOMPLETE, CRITICAL_ERROR, CRITICAL_ERROR_INCOMPLETE, FATAL_ERROR, FATAL_ERROR_INCOMPLETE, EMERGENCY, EMERGENCY_INCOMPLETE, PANIC, PANIC_INCOMPLETE);
@@ -275,6 +292,7 @@ public class ProblemState implements UIEquipped {
             case FATAL_ERROR_INDEX     : return (information_complete ? FATAL_ERROR : FATAL_ERROR_INCOMPLETE);
             case EMERGENCY_INDEX       : return (information_complete ? EMERGENCY : EMERGENCY_INCOMPLETE);
             case PANIC_INDEX           : return (information_complete ? PANIC : PANIC_INCOMPLETE);
+            case UNDEFINED_INDEX       : return (information_complete ? UNDEFINED : UNDEFINED_INCOMPLETE);
             default                    : return null;
         }
     }
@@ -283,32 +301,39 @@ public class ProblemState implements UIEquipped {
         return state_map.get(id);
     }
 
+    public boolean isDefined(CallContext cc) {
+        return (index != UNDEFINED_INDEX ? true : false);
+    }
+
     public boolean isOk(CallContext cc) {
-        return (index == OK_INDEX && information_complete ? true : false);
+        return ((index == OK_INDEX || index == UNDEFINED_INDEX) && information_complete ? true : false);
     }
 
     public boolean isGreen(CallContext cc) {
-        return (index < UNKNOWN_INDEX ? true : false);
+        return ((index < UNKNOWN_INDEX || index == UNDEFINED_INDEX) ? true : false);
     }
 
     public boolean isYellow(CallContext cc) {
-        return ((index >= UNKNOWN_INDEX && index < ERROR_INDEX) ? true : false);
+        return ((index >= UNKNOWN_INDEX && index < ERROR_INDEX && index != UNDEFINED_INDEX) ? true : false);
     }
 
     public boolean isRed(CallContext cc) {
-        return (index >= ERROR_INDEX ? true : false);
+        return ((index >= ERROR_INDEX && index != UNDEFINED_INDEX) ? true : false);
     }
 
     public boolean isBelow(CallContext cc, ProblemState other) {
-        return (index < other.index ? true : false);
+        return ((index < other.index || (index == UNDEFINED_INDEX && other.index != UNDEFINED_INDEX)) ? true : false);
     }
 
     public boolean isBelowOrEquals(CallContext cc, ProblemState other) {
-        return (index <= other.index ? true : false);
+        return ((index <= other.index || index == UNDEFINED_INDEX) ? true : false);
     }
 
     public ProblemState combineWith(CallContext context, ProblemState other) {
-        return getProblemState(context, this.index > other.index ? this.index : other.index, this.information_complete && other.information_complete);
+        return getProblemState(context, (this.index != UNDEFINED_INDEX && this.index > other.index)
+                                         ? this.index
+                                         : other.index,
+                                        this.information_complete && other.information_complete);
     }
 
     static public ProblemState combine(CallContext context, ProblemState... problem_states) {
@@ -358,6 +383,7 @@ public class ProblemState implements UIEquipped {
             case FATAL_ERROR_INDEX     : return "fatal error" + (information_complete ? "" : " (incomplete)");
             case EMERGENCY_INDEX       : return "emergency" + (information_complete ? "" : " (incomplete)");
             case PANIC_INDEX           : return "panic" + (information_complete ? "" : " (incomplete)");
+            case UNDEFINED_INDEX       : return "undefined" + (information_complete ? "" : " (incomplete)");
             default                    : return "[?]";
         }
     }
@@ -377,6 +403,7 @@ public class ProblemState implements UIEquipped {
             case FATAL_ERROR_INDEX     : return "fatal error";
             case EMERGENCY_INDEX       : return "emergency";
             case PANIC_INDEX           : return "panic";
+            case UNDEFINED_INDEX       : return "undefined";
             default                    : return "[?]";
         }
     }
@@ -400,6 +427,7 @@ public class ProblemState implements UIEquipped {
             case FATAL_ERROR_INDEX     : return "fatal" + (information_complete ? "" : " ...");
             case EMERGENCY_INDEX       : return "emergency" + (information_complete ? "" : " ...");
             case PANIC_INDEX           : return "panic" + (information_complete ? "" : " ...");
+            case UNDEFINED_INDEX       : return "undefined" + (information_complete ? "" : " ...");
             default                    : return "[?]";
         }
     }
@@ -419,6 +447,7 @@ public class ProblemState implements UIEquipped {
             case FATAL_ERROR_INDEX     : return "fatal-error" + (information_complete ? "" : "-incomplete");
             case EMERGENCY_INDEX       : return "emergency" + (information_complete ? "" : "-incomplete");
             case PANIC_INDEX           : return "panic" + (information_complete ? "" : "-incomplete");
+            case UNDEFINED_INDEX       : return "undefined" + (information_complete ? "" : "-incomplete");
             default                    : return "[?]";
         }
     }
@@ -456,6 +485,8 @@ public class ProblemState implements UIEquipped {
             choice_set.add(EMERGENCY_INCOMPLETE);
             choice_set.add(PANIC);
             choice_set.add(PANIC_INCOMPLETE);
+            choice_set.add(UNDEFINED);
+            choice_set.add(UNDEFINED_INCOMPLETE);
         }
 
         return choice_set;
@@ -472,5 +503,9 @@ public class ProblemState implements UIEquipped {
 
     public Vector<UIEquipment> getUIEquipments(CallContext context, String feature) {
         return null;
+    }
+
+    public void jsonSerialise(CallContext context, JSONSerialiser serialiser) throws java.io.IOException {
+        serialiser.serialise(context, this.getUniqueIdentifier(context), null);
     }
 }

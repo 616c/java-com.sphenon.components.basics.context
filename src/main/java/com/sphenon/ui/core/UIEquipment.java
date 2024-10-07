@@ -21,4 +21,6 @@ public interface UIEquipment {
     public UIEquipmentType getType(CallContext context);
 
     public Object getValue(CallContext context);
+
+    public boolean getInflectable(CallContext context);
 }

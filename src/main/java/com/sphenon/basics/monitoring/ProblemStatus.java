@@ -73,6 +73,13 @@ public class ProblemStatus implements Dumpable, Problem, UIEquipped {
         this.problem = problem;
     }
 
+    public String getText(CallContext context) {
+        if (this.problem != null) {
+            return this.problem.toString();
+        }
+        return this.problem_state.toString();
+    }
+
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("[");

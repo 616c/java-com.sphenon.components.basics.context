@@ -16,7 +16,7 @@ package com.sphenon.basics.tracking.annotations;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface ArtefactInfo {
     String Name () default "";

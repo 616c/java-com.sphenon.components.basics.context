@@ -15,6 +15,7 @@ package com.sphenon.basics.monitoring;
 *****************************************************************************/
 
 import com.sphenon.basics.context.*;
+import com.sphenon.basics.context.classes.*;
 import com.sphenon.basics.debug.*;
 
 import java.io.PrintStream;
@@ -29,6 +30,13 @@ public class ProblemException implements Problem, Dumpable, ContextAware {
     public ProblemException(CallContext context, Throwable exception) {
         this.context   = context;
         this.exception = exception;
+        this.message   = null;
+    }
+
+    public ProblemException(CallContext context, Throwable exception, String message) {
+        this.context   = context;
+        this.exception = exception;
+        this.message   = message;
     }
 
     protected CallContext context;
@@ -51,12 +59,28 @@ public class ProblemException implements Problem, Dumpable, ContextAware {
         this.exception = exception;
     }
 
+    protected String message;
+
+    public String getMessage (CallContext context) {
+        return this.message;
+    }
+
+    public void setMessage (CallContext context, String message) {
+        this.message = message;
+    }
+
+    public String getText(CallContext context) {
+        return this.toString();
+    }
+
     public String toString() {
-        return (this.exception == null ? "" : this.exception.toString());
+        String m = this.getMessage(RootContext.getFallbackCallContext());
+        return (m == null ? "" : (m + " - ")) + (this.exception == null ? "" : this.exception.toString());
     }
 
     public String toString(CallContext context) {
-        return (this.exception == null ? "" : dumpThrowable(context, this.exception));
+        String m = this.getMessage(context);
+        return (m == null ? "" : (m + " - ")) + (this.exception == null ? "" : dumpThrowable(context, this.exception));
     }
 
     static public int stack_trace_length = 10;
@@ -75,6 +99,10 @@ public class ProblemException implements Problem, Dumpable, ContextAware {
     }
 
     public void dump(CallContext context, DumpNode dump_node) {
+        String m = this.getMessage(context);
+        if (m != null && m.isEmpty() == false) {
+            dump_node.dump(context, "Message", m);
+        }
         if (this.exception instanceof Dumpable) {
             ((Dumpable) this.exception).dump(context, dump_node);
         } else {

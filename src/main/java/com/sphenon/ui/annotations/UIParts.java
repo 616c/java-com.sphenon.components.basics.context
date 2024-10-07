@@ -16,7 +16,7 @@ package com.sphenon.ui.annotations;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface UIParts {
     String[] value();

@@ -15,6 +15,7 @@ package com.sphenon.basics.debug;
 *****************************************************************************/
 
 import java.io.PrintWriter;
+import java.io.IOException;
 import com.sphenon.basics.context.*;
 
 public class DumpNode_Writer implements DumpNode {
@@ -52,11 +53,14 @@ public class DumpNode_Writer implements DumpNode {
         this.technical_details = technical_details;
     }
     
+    static public void dumpToWriter(CallContext context, String name, Object value, PrintWriter ps) {
+        (new DumpNode_Writer(context, ps)).dump(context, name, value);
+    }
+
     public void dump(CallContext context, String value) {
         if (first == false || this.name_value_same_line == false) { this.out.print(this.indent); } else { this.first = false; }
         this.out.println(value);
     }
-
 
     public void dump(CallContext context, String name, Object value) {
         if (this.first == false || this.name_value_same_line == false) { this.out.print(this.indent); } else { this.first = false; }
@@ -74,7 +78,9 @@ public class DumpNode_Writer implements DumpNode {
                 new_indent += indent_increment;
             }
         }
-        if (value instanceof Dumpable) {
+        if (    value instanceof Dumpable
+             && (value instanceof Throwable) == false
+           ) {
             if (this.isCurrentlyDumped(context, value)) {
                 this.out.println("-- recursion: dump discontinued --");
             } else {
@@ -89,7 +95,7 @@ public class DumpNode_Writer implements DumpNode {
             Dumper.dumpCommonType(context, value, subdn);
             subdn.close(context);
         } else {
-            this.out.println(value == null ? "(null)" : value.toString());
+            this.out.println(value == null ? "(null)" : ContextAware.ToString.convert(context, value));
         }
     }
 

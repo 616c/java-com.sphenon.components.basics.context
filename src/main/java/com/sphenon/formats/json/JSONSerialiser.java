@@ -15,6 +15,7 @@ package com.sphenon.formats.json;
 *****************************************************************************/
 
 import com.sphenon.basics.context.*;
+import com.sphenon.basics.state.*;
 
 import java.io.IOException;
 
@@ -32,7 +33,17 @@ public interface JSONSerialiser {
     public String  getProperty(CallContext context, String name, String default_value);
     public String  setProperty(CallContext context, String name, String value);
 
-    public Object getAttachment(CallContext context, String name);
-    public void   setAttachment(CallContext context, String name, Object attachment);
+    public void pushProperties(CallContext context, String... properties);
+    public void popProperties (CallContext context);
 
+    public Object getAttachment(CallContext context, String name);
+    public Object setAttachment(CallContext context, String name, Object attachment);
+    public void   removeAttachment(CallContext context, String name);
+
+    public void pushAttachments(CallContext context, Object... attachments);
+    public void popAttachments (CallContext context);
+
+    public State getSerialisationState(CallContext context);
+    public State popSerialisationState(CallContext context);
+    public void pushSerialisationState(CallContext context, State serialisation_state);
 }

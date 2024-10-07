@@ -38,11 +38,15 @@ public class ProblemMessage implements Problem, Dumpable {
         this.message = message;
     }
 
+    public String getText(CallContext context) {
+        return this.toString();
+    }
+
     public String toString() {
         return this.message;
     }
 
     public void dump(CallContext context, DumpNode dump_node) {
-        dump_node.dump(context, "Message", this.message);
+        dump_node.dump(context, "Message", this.getMessage(context));
     }
 }

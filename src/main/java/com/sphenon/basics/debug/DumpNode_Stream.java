@@ -15,6 +15,8 @@ package com.sphenon.basics.debug;
 *****************************************************************************/
 
 import java.io.PrintStream;
+import java.io.OutputStream;
+import java.io.IOException;
 import com.sphenon.basics.context.*;
 
 public class DumpNode_Stream implements DumpNode {
@@ -52,6 +54,38 @@ public class DumpNode_Stream implements DumpNode {
         this.technical_details = technical_details;
     }
     
+    static public void dumpToStream(CallContext context, String name, Object value, OutputStream os) {
+        try {
+            PrintStream ps = new PrintStream(os);
+            (new DumpNode_Stream(context, ps)).dump(context, name, value);
+            ps.close();
+            os.close();
+        } catch (IOException ioe) {
+            System.err.println("*** DUMP TO STREAM FAILED ***");
+            System.err.println(ioe.toString());
+        }
+    }
+
+    static public void dumpToStream(CallContext context, String name, Object value, OutputStream os, String indent, boolean show_names, boolean name_value_same_line, String indent_increment, boolean technical_details) {
+        try {
+            PrintStream ps = new PrintStream(os);
+            (new DumpNode_Stream(context, ps, indent, null, show_names, name_value_same_line, indent_increment, technical_details)).dump(context, name, value);
+            ps.close();
+            os.close();
+        } catch (IOException ioe) {
+            System.err.println("*** DUMP TO STREAM FAILED ***");
+            System.err.println(ioe.toString());
+        }
+    }
+
+    static public void dumpToPrintStream(CallContext context, String name, Object value, PrintStream ps) {
+        (new DumpNode_Stream(context, ps)).dump(context, name, value);
+    }
+
+    static public void dumpToPrintStream(CallContext context, String name, Object value, PrintStream ps, String indent, boolean show_names, boolean name_value_same_line, String indent_increment, boolean technical_details) {
+        (new DumpNode_Stream(context, ps, indent, null, show_names, name_value_same_line, indent_increment, technical_details)).dump(context, name, value);
+    }
+
     public void dump(CallContext context, String value) {
         if (first == false || this.name_value_same_line == false) { this.out.print(this.indent); } else { this.first = false; }
         this.out.println(value);
@@ -74,7 +108,9 @@ public class DumpNode_Stream implements DumpNode {
                 new_indent += indent_increment;
             }
         }
-        if (value instanceof Dumpable) {
+        if (    value instanceof Dumpable
+             && (value instanceof Throwable) == false
+           ) {
             if (this.isCurrentlyDumped(context, value)) {
                 this.out.println("-- recursion: dump discontinued --");
             } else {
@@ -89,7 +125,7 @@ public class DumpNode_Stream implements DumpNode {
             Dumper.dumpCommonType(context, value, subdn);
             subdn.close(context);
         } else {
-            this.out.println(value == null ? "(null)" : value.toString());
+            this.out.println(value == null ? "(null)" : ContextAware.ToString.convert(context, value));
         }
     }
 

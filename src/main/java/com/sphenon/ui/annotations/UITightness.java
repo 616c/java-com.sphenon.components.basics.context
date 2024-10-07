@@ -18,7 +18,7 @@ import com.sphenon.ui.core.*;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface UITightness {
     UIMemberTightness value();

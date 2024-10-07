@@ -15,6 +15,9 @@ package com.sphenon.basics.processing;
 *****************************************************************************/
 
 import com.sphenon.basics.context.*;
+import com.sphenon.basics.context.classes.*;
+
+import com.sphenon.basics.processing.classes.*;
 
 import com.sphenon.ui.annotations.*;
 
@@ -44,6 +47,8 @@ public interface Progression {
        detect changes in progression by invoking the equals method.
     */
     public Progression getSnapshot(CallContext context);
+
+    static public Progression NONE = new Class_Progression(RootContext.getInitialisationContext(), Progress.NO_PROGRESS);
 }
 /*
   subclasses: ProgressInPercent,

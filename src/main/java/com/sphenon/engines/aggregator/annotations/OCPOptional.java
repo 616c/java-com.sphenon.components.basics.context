@@ -16,6 +16,6 @@ package com.sphenon.engines.aggregator.annotations;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+@Retention(RetentionPolicy.RUNTIME)
 public @interface OCPOptional {
 }

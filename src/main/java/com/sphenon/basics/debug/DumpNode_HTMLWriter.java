@@ -18,19 +18,13 @@ import java.io.PrintWriter;
 import com.sphenon.basics.context.*;
 
 
-/*
-
-incomplete
+/* incomplete - not evaluated yet:
 
     protected boolean             show_names;
     protected boolean             name_value_same_line;
     protected String              indent_increment;
     protected boolean             technical_details;
-
-wird noch nicht ausgewertet
-
  */
-
 
 public class DumpNode_HTMLWriter implements DumpNode {
 
@@ -76,7 +70,10 @@ public class DumpNode_HTMLWriter implements DumpNode {
 
     public void dump(CallContext context, String name, Object value) {
         this.out.print("<tr>" + (this.indent == 0 ? "" : ("<td colspan=\"" + indent + "\"></td>")) + "<th>" + name + "</th><td>");
-        if (value instanceof Dumpable) {
+        if (    value instanceof Dumpable
+             && (value instanceof Throwable) == false
+           ) {
+
             if (this.isCurrentlyDumped(context, value)) {
                 this.out.println("-- recursion: dump discontinued --");
             } else {
@@ -91,7 +88,7 @@ public class DumpNode_HTMLWriter implements DumpNode {
             Dumper.dumpCommonType(context, value, subdn);
             subdn.close(context);
         } else {
-            this.out.println(value == null ? "(null)" : value.toString());
+            this.out.println(value == null ? "(null)" : ContextAware.ToString.convert(context, value));
         }
         this.out.println("</td></tr>");
     }

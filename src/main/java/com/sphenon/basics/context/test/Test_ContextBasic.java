@@ -42,8 +42,6 @@ public class Test_ContextBasic extends com.sphenon.basics.testing.classes.TestBa
     }
 
     static public void main(String[] args) {
-        // info();
-
         Context context = com.sphenon.basics.context.classes.RootContext.getRootContext ();
         TestRun test_run = new com.sphenon.basics.testing.classes.ClassTestRun(context);
         TestResult result = (new Test_ContextBasic(context, true)).perform(context, test_run);
@@ -170,41 +168,3 @@ public class Test_ContextBasic extends com.sphenon.basics.testing.classes.TestBa
         }
     }
 }
-
-/*
-java.vm.specification.version: 1.0
-java.vm.specification.vendor : Sun Microsystems Inc.
-java.vm.specification.name   : Java Virtual Machine Specification
-java.vm.version              : 1.4.2_05-b04
-java.vm.vendor               : Sun Microsystems Inc.
-java.vm.name                 : Java HotSpot(TM) Client VM
-java.version                 : 1.4.2_05
-java.vendor                  : Sun Microsystems Inc.
-java.specification.version   : 1.4
-java.specification.name      : Java Platform API Specification
-java.specification.vendor    : Sun Microsystems Inc.
-java.lang: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.net.www.protocol.file: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.net: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.security: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.security.util: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.net.www: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.nio.charset: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.lang.reflect: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.misc: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.nio.charset.spi: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.util: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.io: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.lang.ref: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.reflect: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.security.cert: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.io: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.net.www.protocol.jar: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.util.zip: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-sun.nio.cs: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-java.nio: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-com.sphenon.basics.context.test: null, null, null
-java.util.jar: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-com.sphenon.basics.context: null, null, null
-sun.security.action: Java Runtime Environment, 1.4.2_05, Sun Microsystems, Inc.
-*/

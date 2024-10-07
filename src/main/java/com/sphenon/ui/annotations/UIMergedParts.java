@@ -16,7 +16,11 @@ package com.sphenon.ui.annotations;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME) // SOURCE - CLASS - RUNTIME
+/**
+   Each entry is an expression that results in an
+   instance which is examined for it's parts.
+ */
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface UIMergedParts {
     String[] value();

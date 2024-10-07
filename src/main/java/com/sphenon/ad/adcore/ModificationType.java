@@ -23,5 +23,7 @@ public enum ModificationType {
     INITIALISATION,
     EXTERNAL_ASSIGNMENT,
     STATE_LOAD,
-    BIDIRECTIONAL_SYNCHRONISATION
+    BIDIRECTIONAL_SYNCHRONISATION,
+    DELETION,                      // domain instance is logically deleted
+    FINALISATION                   // in memory instance is destroyed, but domain instace stays existing
 }

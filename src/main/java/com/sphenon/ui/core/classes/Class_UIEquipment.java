@@ -46,4 +46,18 @@ public class Class_UIEquipment implements UIEquipment {
     public void setValue (CallContext context, Object value) {
         this.value = value;
     }
+
+    protected boolean inflectable;
+
+    public boolean getInflectable (CallContext context) {
+        return this.inflectable;
+    }
+
+    public boolean defaultInflectable (CallContext context) {
+        return false;
+    }
+
+    public void setInflectable (CallContext context, boolean inflectable) {
+        this.inflectable = inflectable;
+    }
 }

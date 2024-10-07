@@ -15,6 +15,7 @@ package com.sphenon.basics.debug;
 *****************************************************************************/
 
 import com.sphenon.basics.context.*;
+import com.sphenon.basics.exception.*;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -27,8 +28,6 @@ public class StackFrame_JavaException extends StackFrame implements Dumpable {
     public StackFrame_JavaException(CallContext context, Throwable exception) {
         super(context);
         this.exception = exception;
-//         System.err.println("SFJE");
-//         exception.printStackTrace();
     }
 
     protected List<Stack> sub_stacks;
@@ -185,7 +184,7 @@ public class StackFrame_JavaException extends StackFrame implements Dumpable {
 
         return this.parent_stack;
     }
-    
+
     public void dump(CallContext context, DumpNode dump_node) {
         String message;
         if (exception instanceof ExceptionWithHelpMessage) {
@@ -198,14 +197,18 @@ public class StackFrame_JavaException extends StackFrame implements Dumpable {
             message = ContextAware.ToString.convert(context, exception);
         }
         dump_node.dump(context, "Exception", message);
-        List<Stack> sub_stacks = this.getSubStacks(context);
-        if (sub_stacks != null && sub_stacks.size() != 0) {
-            DumpNode dn = dump_node.openDump(context, "Causes ");
-            int i=0;
-            for (Stack sub_stack : sub_stacks) {
-                dn.dump(context, (new Integer(i++)).toString(), sub_stack);
+        if (exception instanceof ThrowableData) {
+            ((ThrowableData) exception).dump(context, dump_node);
+        } else {
+            List<Stack> sub_stacks = this.getSubStacks(context);
+            if (sub_stacks != null && sub_stacks.size() != 0) {
+                DumpNode dn = dump_node.openDump(context, "Causes ");
+                int i=0;
+                for (Stack sub_stack : sub_stacks) {
+                    dn.dump(context, (new Integer(i++)).toString(), sub_stack);
+                }
+                dn.close(context);
             }
-            dn.close(context);
         }
     }
 }

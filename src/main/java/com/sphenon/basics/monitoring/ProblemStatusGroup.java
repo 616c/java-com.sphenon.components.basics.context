@@ -59,6 +59,10 @@ public class ProblemStatusGroup extends ProblemStatus {
         return this.problems;
     }
 
+    public String getText(CallContext context) {
+        return this.toString();
+    }
+
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         if (problem_statuses != null && problem_statuses.length != 0) {

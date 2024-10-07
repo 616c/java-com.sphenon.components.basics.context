@@ -63,13 +63,6 @@ public class RootContext {
        @return previous value of fallback context
      */
     public static CallContext setFallbackCallContext (CallContext cc) {
-      // Debug Code
-      //{
-      //  StackTraceElement[] trace= Thread.currentThread().getStackTrace();
-      //  int i=2;
-      //  System.err.println(trace[i].getClassName() + "." + trace[i].getMethodName() + 
-      //   "[" + trace[i].getFileName() + ":" + trace[i].getLineNumber() + "] Fallback is now " + cc );
-      //} 
         if (fallback_context == null) {
             fallback_context = new ThreadLocal<CallContext>();
         }

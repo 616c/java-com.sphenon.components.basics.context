@@ -47,16 +47,6 @@ public class DebugClassLoader extends URLClassLoader {
         if (access_counters == null) {
             access_counters = new HashMap<String,Integer>();
         }
-//         if (access.equals("loadClass com.sphenon.basics.encoding.Encoding")) {
-//             // debug_traces
-//             String st = "";
-//             StackTraceElement[] stacktrace = (new Throwable()).getStackTrace();
-//             for (int i=0; i<stacktrace.length && i < 16; i++) {
-//                 StackTraceElement ste = stacktrace[i];
-//                 st += " [" + ste + "]";
-//             }
-//             System.err.println("ENC: " + st);
-//         }
         Integer current = access_counters.get(access);
         access_counters.put(access, current == null ? 1 : (current +1));
     }

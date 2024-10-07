@@ -38,6 +38,10 @@ public class ProblemGroup implements Problem, Dumpable {
         }
     }
 
+    public String getText(CallContext context) {
+        return this.toString();
+    }
+
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         if (problems != null && problems.length != 0) {

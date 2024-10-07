@@ -21,5 +21,7 @@ import java.io.PrintWriter;
 public interface OCPSerialiser {
     public PrintWriter getPrintWriter(CallContext context);
     public void serialise(CallContext context, Object object, String name, boolean as_reference);
+    public void serialiseAsText(CallContext context, Object object, String name, boolean as_reference);
     public void serialise(CallContext context, Object object, String name, boolean as_reference, String cls);
+    public void serialiseAsText(CallContext context, Object object, String name, boolean as_reference, String cls);
 }

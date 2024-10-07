@@ -36,6 +36,10 @@ public class ProblemEmpty implements Problem, Dumpable {
     public void dump(CallContext context, DumpNode dump_node) {
     }
 
+    public String getText(CallContext context) {
+        return this.toString();
+    }
+
     public String toString() {
         return "";
     }

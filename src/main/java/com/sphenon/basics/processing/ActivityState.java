@@ -16,6 +16,7 @@ package com.sphenon.basics.processing;
 
 import com.sphenon.basics.context.*;
 import com.sphenon.ui.core.*;
+import com.sphenon.formats.json.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import com.sphenon.ui.annotations.*;
 @UIId         ("activity_state")
 @UIName       ("ActivityState")
 @UIClassifier ("ActivityState")
-public class ActivityState implements UIEquipped {
+public class ActivityState implements UIEquipped, JSONSerialisable {
 
     static public ActivityState ATREST      ; // a process activity which is momentarily inactive,
                                               // since it is not needed; and it is unknown whether
@@ -110,6 +111,14 @@ public class ActivityState implements UIEquipped {
 
     public int getIndex (CallContext cc) {
         return this.index;
+    }
+
+    public boolean isTerminated (CallContext cc) {
+        return (    this == ABORTED
+                 || this == COMPLETED
+                 || this == VERIFIED
+                 || this == SKIPPED
+                 ? true : false);
     }
 
     static protected Map<Integer, ActivityState> map;
@@ -204,5 +213,9 @@ public class ActivityState implements UIEquipped {
 
     public Vector<UIEquipment> getUIEquipments(CallContext context, String feature) {
         return null;
+    }
+
+    public void jsonSerialise(CallContext context, JSONSerialiser serialiser) throws java.io.IOException {
+        serialiser.serialise(context, this.toString(), null);
     }
 }
